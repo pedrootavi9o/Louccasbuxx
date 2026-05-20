@@ -1,40 +1,427 @@
-```html
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Louccas Buxx | Aesthetic Shop</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-purple: #9d4edd;
-            --deep-purple: #240046;
-            --neon-glow: #c77dff;
-        }
+```react
+import React, { useState, useEffect, useMemo } from 'react';
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0a0a0c;
-            color: #e0e0e0;
-            overflow: hidden;
-        }
+// Mock de produtos premium do mesmo nicho (Gamer / Digital) acima de R$ 20,00
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Conta Blox Fruits [Level Max + Godhuman + Dough Ingerida]",
+    category: "blox-fruits",
+    price: 49.90,
+    oldPrice: 79.90,
+    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Mais Vendido",
+    delivery: "Automática",
+    features: ["Level 2550 (Max)", "Estilo de Luta Godhuman", "Fruta Dough Ativada", "Várias Espadas Lendárias"]
+  },
+  {
+    id: 2,
+    name: "Pacote de 2.000 Robux - Envio Direto via Grupo",
+    category: "robux",
+    price: 89.90,
+    oldPrice: 110.00,
+    image: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Entrega Rápida",
+    delivery: "Até 15 min",
+    features: ["Envio 100% Seguro", "Sem necessidade de senha", "Suporte Completo", "Bônus de 100 Robux extra"]
+  },
+  {
+    id: 3,
+    name: "Discord Nitro Boost - Assinatura Anual (Gift Link)",
+    category: "discord",
+    price: 119.90,
+    oldPrice: 159.90,
+    image: "https://images.unsplash.com/photo-1614680376593-902f74fa0d41?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Melhor Preço",
+    delivery: "Automática",
+    features: ["12 Meses Completos", "2 Impulsos de Servidor", "Emojis Personalizados Globais", "Avatar Animado e Banner"]
+  },
+  {
+    id: 4,
+    name: "Gift Card Valorant 5.000 VP (Região Brasil)",
+    category: "gift-cards",
+    price: 149.90,
+    oldPrice: 165.00,
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Estoque Limitado",
+    delivery: "Automática",
+    features: ["Código Original Riot", "Válido apenas para BR", "Perfeito para comprar Skins Premium", "Resgate Imediato"]
+  },
+  {
+    id: 5,
+    name: "Conta Steam Premium [GTA V + Red Dead Redemption 2 + Cyberpunk 2077]",
+    category: "contas",
+    price: 79.90,
+    oldPrice: 199.90,
+    image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Promoção",
+    delivery: "Automática",
+    features: ["Acesso Completo (Pode alterar dados)", "Sem banimentos (VAC Clean)", "Jogos offline e online liberados", "Suporte Vitalício"]
+  },
+  {
+    id: 6,
+    name: "Minecraft Java & Bedrock Edition - Chave de Ativação Permanente",
+    category: "gift-cards",
+    price: 59.90,
+    oldPrice: 129.00,
+    image: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Original",
+    delivery: "Automática",
+    features: ["Ativa na sua própria conta Microsoft", "Acesso às duas versões (Java/Bedrock)", "Multiplayer e servidores liberados", "Código Oficial"]
+  },
+  {
+    id: 7,
+    name: "Assinatura Xbox Game Pass Ultimate - 3 Meses (Código)",
+    category: "gift-cards",
+    price: 69.90,
+    oldPrice: 89.90,
+    image: "https://images.unsplash.com/photo-1602684523824-1f19e6a1458f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Sucesso de Vendas",
+    delivery: "Automática",
+    features: ["Compatível com PC e Xbox", "Acesso ao EA Play incluso", "Centenas de jogos de alta qualidade", "Válido para contas novas e antigas"]
+  },
+  {
+    id: 8,
+    name: "Conta League of Legends lvl 30+ (Unranked, 50k-60k de Essência Azul)",
+    category: "contas",
+    price: 24.90,
+    oldPrice: 39.90,
+    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    badge: "Pronto para Ranked",
+    delivery: "Automática",
+    features: ["Email não verificado (Altere de imediato)", "Sem histórico de partidas", "Essência ideal para comprar campeões", "Garantia de 30 dias contra banimento por botting"]
+  }
+];
 
-        /* Fundo Animado */
-        .bg-mesh {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(157, 78, 221, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(60, 9, 108, 0.2) 0%, transparent 40%);
-        }
+const CATEGORIES = [
+  { id: 'all', name: 'Todos os Itens' },
+  { id: 'blox-fruits', name: 'Blox Fruits' },
+  { id: 'robux', name: 'Robux' },
+  { id: 'discord', name: 'Discord' },
+  { id: 'gift-cards', name: 'Gift Cards' },
+  { id: 'contas', name: 'Contas Premium' }
+];
 
+const RECENT_PURCHASES_TEMPLATES = [
+  { name: "Guilherme S.", product: "Discord Nitro Boost - Assinatura Anual", time: "Há 1 minuto" },
+  { name: "Matheus K.", product: "Conta Blox Fruits [Level Max + Dough]", time: "Há 3 minutos" },
+  { name: "Thiago F.", product: "Pacote de 2.000 Robux", time: "Há 5 minutos" },
+  { name: "Lívia M.", product: "Gift Card Valorant 5.000 VP", time: "Há 8 minutos" },
+  { name: "Pedro H.", product: "Minecraft Java & Bedrock Edition", time: "Há 12 minutos" }
+];
+
+export default function App() {
+  const [cart, setCart] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // Controle de Cupom de Desconto
+  const [coupon, setCoupon] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState(0); // em porcentagem
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+
+  // Controle de Toast customizado (substitui o alert())
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+  // Controle de Visualização de Detalhes do Produto
+  const [selectedProductDetails, setSelectedProductDetails] = useState(null);
+
+  // Controle de Checkout
+  const [checkoutStep, setCheckoutStep] = useState(null); // 'details' | 'payment' | 'pix_qr'
+  const [checkoutForm, setCheckoutForm] = useState({ name: '', email: '', discord: '', paymentMethod: 'pix' });
+  const [pixTimeLeft, setPixTimeLeft] = useState(600); // 10 minutos para pagar o Pix simulado
+
+  // Notificações ao vivo de compras
+  const [liveNotification, setLiveNotification] = useState(null);
+
+  // Mostrar notificação ao vivo aleatoriamente
+  useEffect(() => {
+    const showNotification = () => {
+      const template = RECENT_PURCHASES_TEMPLATES[Math.floor(Math.random() * RECENT_PURCHASES_TEMPLATES.length)];
+      setLiveNotification(template);
+      
+      setTimeout(() => {
+        setLiveNotification(null);
+      }, 5000);
+    };
+
+    const interval = setInterval(showNotification, 18000); // mostra a cada 18 segundos
+    setTimeout(showNotification, 3000); // primeira notificação após 3 segundos
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Timer do QR code do Pix
+  useEffect(() => {
+    if (checkoutStep === 'pix_qr' && pixTimeLeft > 0) {
+      const timer = setInterval(() => {
+        setPixTimeLeft(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [checkoutStep, pixTimeLeft]);
+
+  // Função para engatilhar toasts
+  const triggerToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 4000);
+  };
+
+  // Filtragem de produtos por categoria e barra de pesquisa
+  const filteredProducts = useMemo(() => {
+    return PRODUCTS.filter(prod => {
+      const matchesCategory = selectedCategory === 'all' || prod.category === selectedCategory;
+      const matchesSearch = prod.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            prod.features.some(f => f.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchesCategory && matchesSearch;
+    });
+  }, [selectedCategory, searchQuery]);
+
+  // Adicionar ao Carrinho
+  const addToCart = (product) => {
+    setCart(prevCart => {
+      const existing = prevCart.find(item => item.id === product.id);
+      if (existing) {
+        triggerToast(`+1 "${product.name}" adicionado ao carrinho!`);
+        return prevCart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      }
+      triggerToast(`"${product.name}" adicionado ao carrinho!`);
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+  };
+
+  // Atualizar Quantidade no Carrinho
+  const updateQuantity = (id, delta) => {
+    setCart(prevCart => {
+      return prevCart.map(item => {
+        if (item.id === id) {
+          const newQty = item.quantity + delta;
+          return newQty > 0 ? { ...item, quantity: newQty } : item;
+        }
+        return item;
+      }).filter(item => item.quantity > 0);
+    });
+  };
+
+  // Remover Item do Carrinho
+  const removeFromCart = (id, name) => {
+    setCart(prev => prev.filter(item => item.id !== id));
+    triggerToast(`"${name}" removido do carrinho.`, 'info');
+  };
+
+  // Aplicar Cupom
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    const cleanCoupon = coupon.trim().toUpperCase();
+    if (cleanCoupon === 'NORISTORE10') {
+      setAppliedDiscount(10);
+      setCouponSuccess('Cupom "NORISTORE10" aplicado com sucesso! (10% OFF)');
+      setCouponError('');
+      triggerToast('Desconto de 10% aplicado!');
+    } else if (cleanCoupon === 'GAMER20') {
+      setAppliedDiscount(20);
+      setCouponSuccess('Cupom "GAMER20" aplicado com sucesso! (20% OFF)');
+      setCouponError('');
+      triggerToast('Desconto de 20% aplicado!');
+    } else {
+      setCouponError('Cupom inválido ou expirado.');
+      setCouponSuccess('');
+    }
+  };
+
+  // Cálculos do Carrinho
+  const cartSubtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const discountAmount = (cartSubtotal * appliedDiscount) / 100;
+  const cartTotal = cartSubtotal - discountAmount;
+
+  // Iniciar Checkout
+  const startCheckout = () => {
+    if (cart.length === 0) {
+      triggerToast('Seu carrinho está vazio!', 'error');
+      return;
+    }
+    setCheckoutStep('details');
+  };
+
+  // Concluir etapa de detalhes e ir para pagamento
+  const submitDetails = (e) => {
+    e.preventDefault();
+    if (!checkoutForm.name || !checkoutForm.email) {
+      triggerToast('Preencha os campos obrigatórios!', 'error');
+      return;
+    }
+    setCheckoutStep('payment');
+  };
+
+  // Confirmar pagamento simulado
+  const submitPayment = () => {
+    if (checkoutForm.paymentMethod === 'pix') {
+      setPixTimeLeft(600); // Reseta cronômetro (10 minutos)
+      setCheckoutStep('pix_qr');
+    } else {
+      // Simulação rápida para cartão de crédito
+      triggerToast('Processando pagamento via Cartão...', 'info');
+      setTimeout(() => {
+        triggerToast('Pagamento confirmado! O link de entrega foi enviado ao seu email.', 'success');
+        setCart([]);
+        setCheckoutStep(null);
+      }, 3000);
+    }
+  };
+
+  // Copiar código Pix para área de transferência
+  const copyPixCode = () => {
+    const pixCode = "00020101021226870014br.gov.bcb.pix2565pix.noristore.com.br/checkout/payment/active/932482390483204803248324";
+    const dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = pixCode;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+    triggerToast('Código de pagamento Pix copiado para a área de transferência!', 'success');
+  };
+
+  // Formatar tempo em mm:ss
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-600 selection:text-white overflow-x-hidden">
+      
+      {/* HEADER / NAVIGATION BAR */}
+      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+          
+          {/* Logo */}
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}>
+            <div className="h-10 w-10 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(147,51,234,0.5)] group-hover:scale-105 transition-all">
+              {/* Star/Nori Icon */}
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.9 1.393-.9 1.693 0l5.44 11.11 1.22 2.49c.27.55.9.89 1.5.83l3.8-.39c.98-.1 1.386 1.13.674 1.83l-2.83 2.76c-.45.44-.65 1.07-.54 1.69l.73 3.79c.19.98-.84 1.73-1.7 1.25l-3.32-1.85c-.56-.31-1.22-.31-1.78 0l-3.32 1.85c-.86.48-1.89-.27-1.7-1.25l.73-3.79c.11-.62-.09-1.25-.54-1.69l-2.83-2.76c-.712-.7-.306-1.93.674-1.83l3.8.39c.6.06 1.23-.28 1.5-.83l1.22-2.49 5.44-11.11z" />
+              </svg>
+            </div>
+            <div>
+              <span className="text-2xl font-black bg-gradient-to-r from-white via-slate-100 to-purple-400 bg-clip-text text-transparent tracking-wider">NORISTORE</span>
+              <span className="block text-[10px] text-purple-400 font-semibold tracking-widest uppercase">Digital Premium Goods</span>
+            </div>
+          </div>
+
+          {/* Search bar inside header (Desktop) */}
+          <div className="hidden md:flex flex-1 max-w-md relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por conta, robux, nitro..."
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+            />
+          </div>
+
+          {/* Right Action buttons */}
+          <div className="flex items-center gap-4">
+            <a href="#feedbacks" className="hidden lg:inline-flex text-sm text-slate-300 hover:text-purple-400 font-medium transition-colors">
+              Avaliações
+            </a>
+            <a href="#faq" className="hidden lg:inline-flex text-sm text-slate-300 hover:text-purple-400 font-medium transition-colors">
+              FAQ / Ajuda
+            </a>
+
+            {/* Shopping Cart Button */}
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center justify-center transition-all group"
+            >
+              <svg className="h-6 w-6 text-slate-300 group-hover:text-purple-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {cart.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 h-6 w-6 bg-gradient-to-r from-purple-600 to-indigo-500 text-white rounded-full text-xs font-bold flex items-center justify-center animate-bounce shadow-[0_0_10px_rgba(147,51,234,0.7)]">
+                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* MOBILE SEARCH BAR */}
+      <div className="p-4 md:hidden bg-slate-950 border-b border-slate-900">
+        <div className="relative">
+          <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="O que você está procurando hoje?"
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-purple-500 transition-all"
+          />
+        </div>
+      </div>
+
+      {/* MAIN HERO SECTION */}
+      <section className="relative overflow-hidden py-12 lg:py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-900">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 relative z-10">
+          
+          {/* Left Text Column */}
+          <div className="flex-1 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-950/40 border border-purple-800/60 mb-6 text-purple-300 text-xs font-semibold uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+              Loja Oficial NoriStore
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+              Os Melhores Itens de <br className="hidden sm:inline" />
+              <span className="bg-gradient-to-r from-purple-400 via-indigo-400 to-pink-500 bg-clip-text text-transparent">Jogos & Contas</span> Premium.
+            </h1>
+            <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+              Adquira suas moedas e contas favoritas pelo melhor preço de mercado. Entrega rápida, garantida e suporte humanizado 24 horas por dia.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+              <a 
+                href="#produtos" 
+                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-[1.02] active:scale-95 transition-all text-center"
+              >
+                Ver Catálogo de Produtos
+              </a>
+              <a 
+                href="#feedbacks" 
+                className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold rounded-xl hover:text-white transition-all text-center"
+              >
+                Avaliações de Clientes
+              </a>
+            </div>
+          </div>
+
+          {/* Right Visual Image Column */}
+          <div className="flex-1 w-full max-w-md lg:max-w-none relative">
+            <div className="aspect-video lg:aspect-square w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 relative shadow-2xl shadow-indigo-500/5 group">
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10"></div>
+              <img 
+                src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&auto=format&fit=crop&q=80" 
+                alt="NoriStore Gaming Banner" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute bottom-6 left-6 right-6 z-20">
+                <div className="p-4 bg-slate-950/90 backdrop-blur-md rounded-xl border bord
         /* Efeito de Vidro Fosco (Glassmorphism) */
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
